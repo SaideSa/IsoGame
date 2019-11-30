@@ -20,7 +20,7 @@ public class Player extends Entity {
 	private double speed;
 	private ArrayList<Key> keys;
 	private boolean coll;
-	private float xOldPos, yOldPos, xOldRenderPos, yOldRenderPos;
+	private float xOldPos, yOldPos, xOldRenderPos, yOldRenderPos; //für Invariante
 
 	public Player(ArrayList<Key> keys) {
 //		standImg = new Texture(Gdx.files.internal(("playerVR2.png"));
@@ -71,7 +71,7 @@ public class Player extends Entity {
 	@Override
 	public void update(float delta) {
 		
-		//render und map Pos ändern
+		//render und map Pos merken für Invariante
 		xOldPos = pos.x;
 		yOldPos = pos.y;
 		
@@ -80,9 +80,7 @@ public class Player extends Entity {
 		
 		move();
 	
-		
-		
-		System.out.println("x: " + pos.x + "  y: " + pos.y);
+//		System.out.println("x: " + pos.x + "  y: " + pos.y);
 		checkPlayerActions();
 	}
 
@@ -101,9 +99,6 @@ public class Player extends Entity {
 
 	public void move() {
 		
-//		if(pos.x == 15 && pos.y == 15) {
-//			System.out.println("++++++++++++++++++++++++++");
-//		}
 	
 		if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
 

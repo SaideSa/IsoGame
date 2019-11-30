@@ -18,6 +18,7 @@ public class IsometricRenderer {
 
 	private ArrayList<Ground> ground;
 	private ArrayList<EnvObject> envObject;
+	private ArrayList<Cactus> cactus;
 
 	public static final int TILE_WIDTH_NEAR = 128;
 	public static final int TILE_HEIGHT_NEAR = 256;
@@ -43,6 +44,7 @@ public class IsometricRenderer {
 
 		ground = new ArrayList<Ground>();
 		envObject = new ArrayList<EnvObject>();
+		cactus = new ArrayList<Cactus>();
 		level = 1;
 
 		fillMap();
@@ -58,6 +60,10 @@ public class IsometricRenderer {
 
 		for (EnvObject env : envObject) {
 			batch.draw(env.getTex(), env.getRenderPos().x, env.getRenderPos().y, env.getWidth(), env.getHeight());
+		}
+		for(Cactus cact: cactus) {
+			cact.update(delta);
+			batch.draw(cact.getTexture(), cact.getRenderPos().x, cact.getRenderPos().y, cact.getWidth(), cact.getHeight());
 		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
@@ -163,6 +169,20 @@ public class IsometricRenderer {
 			}
 		}
 
+	}
+	
+	public ArrayList<Cactus> createCactus(int amount){
+
+		for(int i=0; i < amount; i++) {
+			float randomX = r.nextFloat()*MAP_SIZE;
+			float randomY = r.nextFloat()*MAP_SIZE;
+			float x = (randomY - randomX) * (TILE_HEIGHT / 4f);
+			float y = (randomY + randomX) * (TILE_WIDTH / 4f);
+			Vector2 renderPos = new Vector2(x, y);
+			Vector2 mapPos = new Vector2(randomX, randomY);
+			cactus.add(new Cactus(renderPos, mapPos));
+		}
+		return cactus;
 	}
 
 	// hier auch noch pos;

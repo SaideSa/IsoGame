@@ -8,26 +8,29 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Physics {
 
-	Rectangle rect;
+	Rectangle envRect;
 	Rectangle playerRect;
+	Rectangle cactusRect;
 	ArrayList<EnvObject> envObjects;
 
 	ArrayList<Rectangle> rectangles;
-	boolean checkCollision;
+	boolean checkEnvCollision;
+	boolean checkCactusCollision;
 	int tileWidth = 64;
 	int tileHeight = 128;
 
 	public Physics(ArrayList<EnvObject> envObjects) {
-		rect = new Rectangle();
+		envRect = new Rectangle();
 		playerRect = new Rectangle();
+		cactusRect = new Rectangle();
 		this.envObjects = envObjects;
 		rectangles = new ArrayList<Rectangle>();
-		checkCollision = false;
+		checkEnvCollision = false;
 	}
 
 
 	public boolean getEnvCollision(Player p) {
-		checkCollision = false;
+		checkEnvCollision = false;
 		playerRect.x = p.getPos().x;
 		playerRect.y = p.getPos().y;
 		playerRect.height = p.getHeight()/tileHeight;
@@ -35,22 +38,37 @@ public class Physics {
 
 		for (int i = 0; i < envObjects.size(); i++) {
 			EnvObject env = envObjects.get(i);
-			rect.x = env.getPos().x-0.3f;
-			rect.y = env.getPos().y-0.3f;
-			rect.height = env.getHeight()/tileHeight+0.6f;
-			rect.width = env.getWidth()/tileWidth+0.6f;
+			envRect.x = env.getPos().x-0.3f;
+			envRect.y = env.getPos().y-0.3f;
+			envRect.height = env.getHeight()/tileHeight+0.6f;
+			envRect.width = env.getWidth()/tileWidth+0.6f;
 			
 			
-			if(rect.overlaps(playerRect)) {
-				checkCollision=true;
+			if(envRect.overlaps(playerRect)) {
+				checkEnvCollision=true;
 				System.out.println("++++++++++++++++++++");
 			}
 			
 
 		}
-		return checkCollision;
+		return checkEnvCollision;
 	}
 
+	public boolean getCactusCollision(Player p, ArrayList<Cactus> cactusList) {
+		checkCactusCollision = false;
+		for(int i = 0; i < cactusList.size(); i++) {
+			Cactus cactus = cactusList.get(i);
+			cactusRect.x = cactus.getPos().x-0.3f;
+			cactusRect.y = cactus.getPos().y-0.3f;
+			cactusRect.height = cactus.getHeight()/tileHeight+0.6f;
+			cactusRect.width = cactus.getHeight()/tileWidth+0.6f;
+			
+			if(cactusRect.overlaps(playerRect)) {
+				checkCactusCollision = true;
+			}
+		}
+		return checkCactusCollision;
+	}
 
 	public ArrayList<Rectangle> getRectangles() {
 		return this.rectangles;

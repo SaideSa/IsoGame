@@ -5,9 +5,16 @@ import java.util.ArrayList;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 
 public class GameScreen extends ScreenAdapter {
@@ -24,6 +31,8 @@ public class GameScreen extends ScreenAdapter {
 
 	private Physics physics;
 	private ArrayList<EnvObject> envObjects;
+	private ArrayList<Cactus> cactus;
+
 
 	public GameScreen(SpriteBatch batch) {
 		this.batch = batch;
@@ -44,6 +53,10 @@ public class GameScreen extends ScreenAdapter {
 			keys.add(new Key(renderer.keysPosition(), key));
 		}
 
+		cactus = renderer.createCactus(3);
+		for(Cactus cact : cactus) {
+			cact.setPlayer(player);
+		}
 		envObjects = renderer.getEnvObject();
 		physics = new Physics(envObjects);
 
@@ -65,6 +78,11 @@ public class GameScreen extends ScreenAdapter {
 
 		renderer.drawGround(batch, delta);
 
+		if(physics.getCactusCollision(player, cactus)) {
+			//hier z.B. HealthBar reduzieren
+			System.out.println("Game Over");
+		}
+		
 		player.update(delta);
 		if(physics.getEnvCollision(player) || player.getPos().x < 0.0 || player.getPos().y < 0.0) {
 			player.setPos(player.getOldPos().x, player.getOldPos().y);
@@ -110,6 +128,7 @@ public class GameScreen extends ScreenAdapter {
 		}
 
 	}
+	
 
 	public void dispose() {
 
