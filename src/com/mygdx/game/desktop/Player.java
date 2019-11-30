@@ -100,7 +100,7 @@ public class Player extends Entity {
 	public void move() {
 		
 	
-		if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
 
 			renderPos.x -= 32 * speed;
 			renderPos.y += 16 * speed;
