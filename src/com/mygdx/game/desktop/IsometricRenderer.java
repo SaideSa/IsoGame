@@ -19,6 +19,7 @@ public class IsometricRenderer {
 	private ArrayList<Ground> ground;
 	private ArrayList<EnvObject> envObject;
 	private ArrayList<Cactus> cactus;
+	private ArrayList<Key> keys;
 
 	public static final int TILE_WIDTH_NEAR = 128;
 	public static final int TILE_HEIGHT_NEAR = 256;
@@ -30,6 +31,7 @@ public class IsometricRenderer {
 
 	private int groundLength;
 	private int level;
+	private Vector2 playerPos;
 
 	public IsometricRenderer() {
 		sand = new Texture(Gdx.files.internal("sand.png"));
@@ -45,10 +47,11 @@ public class IsometricRenderer {
 		ground = new ArrayList<Ground>();
 		envObject = new ArrayList<EnvObject>();
 		cactus = new ArrayList<Cactus>();
+		keys = new ArrayList<Key>();
+		
 		level = 1;
 
 		fillMap();
-		generateEnvironment();
 
 	}
 
@@ -61,9 +64,13 @@ public class IsometricRenderer {
 		for (EnvObject env : envObject) {
 			batch.draw(env.getTex(), env.getRenderPos().x, env.getRenderPos().y, env.getWidth(), env.getHeight());
 		}
-		for(Cactus cact: cactus) {
+		for (Cactus cact : cactus) {
 			cact.update(delta);
-			batch.draw(cact.getTexture(), cact.getRenderPos().x, cact.getRenderPos().y, cact.getWidth(), cact.getHeight());
+			batch.draw(cact.getTexture(), cact.getRenderPos().x, cact.getRenderPos().y, cact.getWidth(),
+					cact.getHeight());
+		}
+		for (Key key : keys) {
+			batch.draw(key.getTexture(), key.getRenderPos().x, key.getRenderPos().y);
 		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
@@ -111,8 +118,6 @@ public class IsometricRenderer {
 
 	}
 
-
-
 	public void generateEnvironment() {
 		boolean large = false;
 		for (int row = MAP_SIZE; row >= 0; row--) {
@@ -125,57 +130,56 @@ public class IsometricRenderer {
 				Vector2 renderPos = new Vector2(x, y);
 				Vector2 mapPos = new Vector2(row, col);
 
-				if(row == 15 && col == 15) {
+				if (row != getPlayerPos().x && col != getPlayerPos().y) {
 
-					envObject.add(new EnvObject(renderPos, mapPos, block, "BlockTest"));
-					//15, 15 ist für Spieler 14, 13
-				}
-				if (level == 1) {
-					if (large == false) {
-						if (num < 9.87) {
+					if (level == 1) {
+						if (large == false) {
+							if (num < 9.87) {
 
-						} else if (num >= 9.87 && num < 9.9 && (row < MAP_SIZE - 2) && col < MAP_SIZE - 2
-								&& (row > 2 && col > 2)) {
-							envObject.add(new EnvObject(renderPos, mapPos, 128, 256, pyramid, "Pyramide"));
-							System.out.println("Row: " + row + "Col: " + col);
-							large = true;
-						} else if (num >= 9.9 && num < 9.95) {
-							envObject.add(new EnvObject(renderPos, mapPos, pyramidFlat, "PyramideFlat"));
+							} else if (num >= 9.87 && num < 9.9 && (row < MAP_SIZE - 2) && col < MAP_SIZE - 2
+									&& (row > 2 && col > 2)) {
+								envObject.add(new EnvObject(renderPos, mapPos, 128, 256, pyramid, "Pyramide"));
+								System.out.println("Row: " + row + "Col: " + col);
+								large = true;
+							} else if (num >= 9.9 && num < 9.95) {
+								envObject.add(new EnvObject(renderPos, mapPos, pyramidFlat, "PyramideFlat"));
+							} else {
+								envObject.add(new EnvObject(renderPos, mapPos, block, "Block"));
+							}
 						} else {
-							envObject.add(new EnvObject(renderPos, mapPos, block, "Block"));
+							large = false;
 						}
-					} else {
-						large = false;
 					}
-				}
-				if (level == 2) {
-					if (large == false) {
-						if (num <= 9.9) {
 
-						} else if (num > 9.9 && num < 9.94 && (row < MAP_SIZE - 4) && col < MAP_SIZE - 4
-								&& (row > 4 && col > 4)) {
-							envObject.add(new EnvObject(renderPos, mapPos, 128, 256, stairsStone, "SteinTreppen"));
-							large = true;
-						} else if (num >= 9.94 && num < 9.98 && (row < MAP_SIZE - 4) && col < MAP_SIZE - 4
-								&& (row > 4 && col > 4)) {
-							envObject.add(new EnvObject(renderPos, mapPos, 128, 256, barrel, "Faß"));
-						} else if ((row < MAP_SIZE - 4) && col < MAP_SIZE - 4 && (row > 4 && col > 4)) {
-							envObject.add(new EnvObject(renderPos, mapPos, 256, 512, chest, "Truhe"));
+					if (level == 2) {
+						if (large == false) {
+							if (num <= 9.9) {
+
+							} else if (num > 9.9 && num < 9.94 && (row < MAP_SIZE - 4) && col < MAP_SIZE - 4
+									&& (row > 4 && col > 4)) {
+								envObject.add(new EnvObject(renderPos, mapPos, 128, 256, stairsStone, "SteinTreppen"));
+								large = true;
+							} else if (num >= 9.94 && num < 9.98 && (row < MAP_SIZE - 4) && col < MAP_SIZE - 4
+									&& (row > 4 && col > 4)) {
+								envObject.add(new EnvObject(renderPos, mapPos, 128, 256, barrel, "Faß"));
+							} else if ((row < MAP_SIZE - 4) && col < MAP_SIZE - 4 && (row > 4 && col > 4)) {
+								envObject.add(new EnvObject(renderPos, mapPos, 256, 512, chest, "Truhe"));
+							}
+						} else {
+							large = false;
 						}
-					} else {
-						large = false;
 					}
 				}
 			}
 		}
 
 	}
-	
-	public ArrayList<Cactus> createCactus(int amount){
 
-		for(int i=0; i < amount; i++) {
-			float randomX = r.nextFloat()*MAP_SIZE;
-			float randomY = r.nextFloat()*MAP_SIZE;
+	public ArrayList<Cactus> createCactus(int amount) {
+
+		for (int i = 0; i < amount; i++) {
+			float randomX = r.nextFloat() * MAP_SIZE;
+			float randomY = r.nextFloat() * MAP_SIZE;
 			float x = (randomY - randomX) * (TILE_HEIGHT / 4f);
 			float y = (randomY + randomX) * (TILE_WIDTH / 4f);
 			Vector2 renderPos = new Vector2(x, y);
@@ -186,31 +190,27 @@ public class IsometricRenderer {
 	}
 
 	// hier auch noch pos;
-	public Vector2 keysPosition() {
-		Vector2 pos = new Vector2();
+	public ArrayList<Key> createKeys(int amount) {
+		for (int i = 0; i < amount; i++) {
+			float randomX = r.nextFloat() * MAP_SIZE;
+			float randomY = r.nextFloat() * MAP_SIZE;
+			float x = (randomY - randomX) * (TILE_HEIGHT / 4f);
+			float y = (randomY + randomX) * (TILE_WIDTH / 4f);
+			Vector2 renderPos = new Vector2(x, y);
+			Vector2 mapPos = new Vector2(randomX, randomY);
+			keys.add(new Key(renderPos, mapPos));
+		}
 
-		int num = r.nextInt(ground.size() - 1);
 
-		Ground g = ground.get(num);
+		return keys;
+	}
 
-//		for(EnvObject env : envObject) {
-//			//Vergleichsoperatoren eig andersherum, aber hat nicht geklappt?
-//			if((env.getX() <= g.getRenderPos().x && env.getX()+env.getWidth() >= g.getRenderPos().x)  && (env.getY() <= g.getRenderPos().y && env.getY()+env.getHeight() >= g.getRenderPos().y)) {
-//				keysPosition();
-//			}
-//		}
-		pos.x = g.getRenderPos().x;
-		pos.y = g.getRenderPos().y;
+	public void setPlayerPos(Vector2 pos) {
+		playerPos = pos;
+	}
 
-//		int xItemMap = r.nextInt(MAP_SIZE);
-//		int yItemMap = r.nextInt(MAP_SIZE);
-//		
-//		float x = (yItemMap - xItemMap) * (TILE_HEIGHT / 5f);
-//		float y = (yItemMap + xItemMap) * (TILE_WIDTH / 5f);
-//
-//		pos[0] = new Vector2(x, y);
-//		pos[1] = new Vector2(xItemMap, yItemMap);
-		return pos;
+	public Vector2 getPlayerPos() {
+		return playerPos;
 	}
 
 	public ArrayList<EnvObject> getEnvObject() {

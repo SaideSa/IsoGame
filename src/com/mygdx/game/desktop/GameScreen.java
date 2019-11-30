@@ -27,12 +27,11 @@ public class GameScreen extends ScreenAdapter {
 	private IsometricRenderer renderer;
 	private Player player;
 	private ArrayList<Key> keys;
-	private Texture key;
+	
 
 	private Physics physics;
 	private ArrayList<EnvObject> envObjects;
 	private ArrayList<Cactus> cactus;
-
 
 	public GameScreen(SpriteBatch batch) {
 		this.batch = batch;
@@ -42,19 +41,20 @@ public class GameScreen extends ScreenAdapter {
 		camera = new OrthographicCamera(WIDTH, HEIGHT);
 		camera.position.set(WIDTH / 2 - 500, HEIGHT / 2, 10);
 		renderer = new IsometricRenderer();
-		
-		player = new Player(keys);
+
+		player = new Player();
 		player.playerSetFirstPos(renderer.MAP_SIZE, renderer.TILE_WIDTH, renderer.TILE_HEIGHT);
+		renderer.setPlayerPos(player.getPos());
 
-		keys = new ArrayList<Key>();
-		key = new Texture(Gdx.files.internal("key.png"));
+		renderer.generateEnvironment();
 
-		for (int i = 0; i < keyAmount; i++) {
-			keys.add(new Key(renderer.keysPosition(), key));
-		}
+		keys = renderer.createKeys(3);
+		
+
+		
 
 		cactus = renderer.createCactus(3);
-		for(Cactus cact : cactus) {
+		for (Cactus cact : cactus) {
 			cact.setPlayer(player);
 		}
 		envObjects = renderer.getEnvObject();
@@ -78,18 +78,22 @@ public class GameScreen extends ScreenAdapter {
 
 		renderer.drawGround(batch, delta);
 
-		if(physics.getCactusCollision(player, cactus)) {
-			//hier z.B. HealthBar reduzieren
+		if (physics.getCactusCollision(player, cactus)) {
+			// hier z.B. HealthBar reduzieren
 			System.out.println("Game Over");
 		}
-		
+
 		player.update(delta);
-		if(physics.getEnvCollision(player) || player.getPos().x < 0.0 || player.getPos().y < 0.0) {
+		if (physics.getEnvCollision(player) || player.getPos().x < 0.0 || player.getPos().y < 0.0 || player.getPos().x > 40.0 && player.getPos().y > 40) {
 			player.setPos(player.getOldPos().x, player.getOldPos().y);
 
 			player.setRenderPos(player.getOldRenderPos().x, player.getOldRenderPos().y);
 		}
-		
+
+		if(physics.getKeyCollision(player, keys)) {
+			int i = physics.getKeyIndex();
+			keys.remove(i);
+		}
 //		if(physics.getEnvCollision(player)) {
 //			Vector2 oldPos = new Vector2(player.getOldPos().x, player.getOldPos().y);
 //			player.setPos(oldPos);
@@ -97,9 +101,6 @@ public class GameScreen extends ScreenAdapter {
 
 		player.render(batch);
 
-		for (int i = 0; i < keyAmount; i++) {
-			keys.get(i).render(batch);
-		}
 
 //		renderer.drawEnvironment(batch);
 		batch.end();
@@ -108,27 +109,25 @@ public class GameScreen extends ScreenAdapter {
 
 	private void handleInput() {
 		if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
-			camera.zoom -= 0.002f;
+			camera.zoom -= 0.004f;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.U)) {
-			camera.zoom += 0.002f;
+			camera.zoom += 0.004f;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.P)) {
 			System.out.println(camera.position);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			camera.position.x -= 1;
+			camera.position.x -= 2;
 		} else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			camera.position.x += 1;
+			camera.position.x += 2;
 		} else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-			camera.position.y += 1;
+			camera.position.y += 2;
 		} else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-			camera.position.y -= 1;
-
+			camera.position.y -= 2;
 		}
 
 	}
-	
 
 	public void dispose() {
 

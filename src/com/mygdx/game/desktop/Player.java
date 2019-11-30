@@ -18,11 +18,12 @@ public class Player extends Entity {
 	private float time;
 	private int direction = 0;
 	private double speed;
-	private ArrayList<Key> keys;
 	private boolean coll;
 	private float xOldPos, yOldPos, xOldRenderPos, yOldRenderPos; //für Invariante
+	private float firstXpos = 4;
+	private float firstYpos = 5;
 
-	public Player(ArrayList<Key> keys) {
+	public Player() {
 //		standImg = new Texture(Gdx.files.internal(("playerVR2.png"));
 		rightLImg = new Texture(Gdx.files.internal("playerRL.png"));
 		leftLImg = new Texture(Gdx.files.internal("playerLL.png"));
@@ -38,7 +39,6 @@ public class Player extends Entity {
 		renderPos = new Vector2();
 		time = 1;
 		speed = 1;
-		this.keys = keys;
 		coll = false;
 	}
 
@@ -81,26 +81,26 @@ public class Player extends Entity {
 		move();
 	
 //		System.out.println("x: " + pos.x + "  y: " + pos.y);
-		checkPlayerActions();
+//		checkPlayerActions();
 	}
 
-	private void checkPlayerActions() {
-		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-			for (Key k : keys) {
-				if (k.renderPos.x == renderPos.x && k.renderPos.y == renderPos.y) {
-
-					keys.remove(k);
-					break;
-				}
-			}
-			System.out.println("RenderPos: " + renderPos + "; Pos: " + pos);
-		}
-	}
+//	private void checkPlayerActions() {
+//		if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
+//			for (Key k : keys) {
+//				if (k.getPos().x == pos.x && k.getPos().y == pos.y) {
+//
+//					keys.remove(k);
+//					break;
+//				}
+//			}
+//			System.out.println("RenderPos: " + renderPos + "; Pos: " + pos);
+//		}
+//	}
 
 	public void move() {
 		
 	
-		if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
 
 			renderPos.x -= 32 * speed;
 			renderPos.y += 16 * speed;
@@ -175,7 +175,7 @@ public class Player extends Entity {
 	public void playerSetFirstPos(int MAP_SIZE, int TILE_WIDTH, int TILE_HEIGHT) {
 		for (int row = MAP_SIZE; row >= 0; row--) {
 			for (int col = MAP_SIZE; col >= 0; col--) {
-				if (row == 4 && col == 5) {
+				if (row == firstXpos && col == firstYpos) {
 					float x = (col - row) * (TILE_HEIGHT / 4f);
 					float y = (col + row) * (TILE_WIDTH / 4f);
 
